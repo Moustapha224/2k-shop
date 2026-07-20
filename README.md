@@ -91,6 +91,27 @@ le seed à partir de `ADMIN_EMAIL` / `ADMIN_PASSWORD` (voir `.env`). Le seed
 crée aussi 5 communes de Conakry, 3 catégories et 9 produits de démonstration
 (sans photos — à ajouter depuis `/admin/produits`).
 
+## Notifications email (Resend)
+
+À chaque nouvelle commande, un email HTML récapitulatif est envoyé au
+propriétaire (`NOTIFICATION_EMAIL`, repli sur `ADMIN_EMAIL`). L'envoi est
+« fire-and-forget » — un incident côté Resend ne fait jamais échouer un
+checkout.
+
+**Activation :**
+
+1. Créer un compte gratuit sur https://resend.com (100 emails/jour offerts).
+2. Générer une clé API dans le dashboard Resend.
+3. La coller dans `.env` : `RESEND_API_KEY="re_..."`.
+4. Redémarrer le serveur (`npm run dev`).
+
+Sans clé, les notifications sont **silencieusement désactivées** et le site
+continue à fonctionner (utile en dev).
+
+**Adresse d'expédition** : par défaut `onboarding@resend.dev` (sandbox — ne
+peut envoyer qu'au propriétaire du compte Resend). Pour une utilisation réelle,
+vérifier un domaine sur Resend puis régler `EMAIL_FROM="2K SHOP <commandes@votre-domaine.gn>"`.
+
 ## Déploiement
 
 Cible envisagée : Vercel + PostgreSQL managé (Neon ou Supabase). Deux points

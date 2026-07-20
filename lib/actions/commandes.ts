@@ -4,8 +4,9 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/db";
+import { sendOrderNotification } from "@/lib/email";
 import { normaliserTelephone } from "@/lib/format";
-import { PREFIXE_COMMANDE } from "@/lib/constants";
+import { PREFIXE_COMMANDE, SITE } from "@/lib/constants";
 import { checkoutSchema, suiviSchema } from "@/lib/validations/checkout";
 
 export type CreerCommandeInput = {
@@ -88,8 +89,8 @@ export async function creerCommande(input: CreerCommandeInput): Promise<ActionEc
   const total = sousTotal + commune.fraisLivraison;
   const numero = await genererNumeroCommande();
 
-  await prisma.$transaction(async (tx) => {
-    await tx.commande.create({
+  const commande = await prisma.$transaction(async (tx) => {
+    const enregistree = await tx.commande.create({
       data: {
         numero,
         clientNom: analyse.data.clientNom,
@@ -113,6 +114,34 @@ export async function creerCommande(input: CreerCommandeInput): Promise<ActionEc
         data: { stock: { decrement: ligne.quantite } },
       });
     }
+
+    return enregistree;
+  });
+
+  // Notification email au proprietaire (fire-and-forget) : on ne veut pas
+  // qu'un incident cote Resend fasse echouer un checkout deja valide.
+  // Les erreurs sont loggees cote serveur, invisibles pour le client.
+  sendOrderNotification({
+    numero: commande.numero,
+    clientNom: commande.clientNom,
+    clientTelephone: commande.clientTelephone,
+    communeNom: commune.nom,
+    quartier: commande.quartier,
+    adresse: commande.adresse,
+    notes: commande.notes,
+    sousTotal: commande.sousTotal,
+    fraisLivraison: commande.fraisLivraison,
+    total: commande.total,
+    createdAt: commande.createdAt,
+    lignes: lignes.map((l) => ({
+      nomProduit: l.nomProduit,
+      taille: l.taille,
+      quantite: l.quantite,
+      sousTotal: l.sousTotal,
+    })),
+    urlAdmin: `${SITE.url}/admin/commandes/${commande.id}`,
+  }).catch((erreur) => {
+    console.error(`[commandes] Notification ${numero} en echec :`, erreur);
   });
 
   revalidatePath("/admin/commandes");
