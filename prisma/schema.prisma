@@ -140,8 +140,13 @@ model Admin {
 
 /// Reglages de la boutique — une seule ligne (id fixe "principal").
 model Parametre {
-  id              String  @id @default("principal")
+  id              String   @id @default("principal")
   whatsapp        String?
+  /// URL complete WhatsApp (ex : lien wa.me/message/XXX a message pre-rempli).
+  /// Si renseignee, prioritaire sur `whatsapp` pour le bouton flottant.
+  whatsappUrl     String?
+  /// Page Facebook de la boutique.
+  facebookUrl     String?
   messageAnnonce  String?
   updatedAt       DateTime @updatedAt
 }

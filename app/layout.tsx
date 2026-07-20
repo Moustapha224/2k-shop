@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
+import { ThemeProvider } from "@/components/shared/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SITE } from "@/lib/constants";
@@ -44,13 +45,16 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
+      // suppressHydrationWarning est requis par next-themes pour l'attribut
+      // `class` ajoute sur <html> avant l'hydratation React.
+      suppressHydrationWarning
       className={`${fontSans.variable} ${fontMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">
-        <TooltipProvider>{children}</TooltipProvider>
-        {/* Le site est volontairement en thème clair : on fige les toasts en clair
-            pour ne pas suivre le thème système de l'appareil. */}
-        <Toaster theme="light" position="top-center" richColors />
+      <body className="flex min-h-full flex-col bg-background text-foreground">
+        <ThemeProvider>
+          <TooltipProvider>{children}</TooltipProvider>
+          <Toaster position="top-center" richColors />
+        </ThemeProvider>
       </body>
     </html>
   );

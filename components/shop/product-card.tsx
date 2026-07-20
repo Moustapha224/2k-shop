@@ -17,14 +17,14 @@ export type ProduitCarte = {
 export function ProductCard({ produit }: { produit: ProduitCarte }) {
   return (
     <Link href={`/produits/${produit.slug}`} className="group block">
-      <Card className="gap-0 overflow-hidden p-0">
-        <div className="relative aspect-square w-full bg-muted">
+      <Card className="gap-0 overflow-hidden p-0 transition-all duration-300 hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-md">
+        <div className="relative aspect-square w-full overflow-hidden bg-muted">
           {produit.image ? (
             <Image
               src={produit.image}
               alt={produit.nom}
               fill
-              className="object-cover transition-transform duration-200 group-hover:scale-105"
+              className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.06]"
               sizes="(min-width: 768px) 220px, 50vw"
             />
           ) : (

@@ -7,6 +7,10 @@
  * Lance directement par Node (pas par le bundler Next.js) : les imports
  * restent en chemins relatifs, pas d'alias `@/`.
  */
+// Charge `.env` — indispensable quand le seed est lance directement par tsx
+// (npm run db:seed) et pas via prisma.config.ts.
+import "dotenv/config";
+
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 
 import { PrismaClient } from "../generated/prisma/client";
@@ -179,23 +183,42 @@ async function main() {
   const adminEmail = process.env.ADMIN_EMAIL ?? "admin@2kshop.gn";
   const adminMotDePasse = process.env.ADMIN_PASSWORD ?? "changeme";
   console.log(`Seed : compte admin (${adminEmail})...`);
+  const motDePasseHash = await bcrypt.hash(adminMotDePasse, 10);
   await prisma.admin.upsert({
     where: { email: adminEmail },
-    update: {},
+    // On met a jour le hash a chaque run pour que changer ADMIN_PASSWORD
+    // dans .env prenne effet en relancant simplement le seed.
+    update: { motDePasseHash },
     create: {
       email: adminEmail,
-      motDePasseHash: await bcrypt.hash(adminMotDePasse, 10),
+      motDePasseHash,
       nom: "Administrateur",
+    },
+  });
+  // Nettoyage des anciens comptes de demonstration (evite qu'un mot de passe
+  // par defaut reste actif apres avoir renseigne le vrai compte proprietaire).
+  await prisma.admin.deleteMany({
+    where: { email: { in: ["admin@2kshop.gn", "admin@exemple.gn"], not: adminEmail },
     },
   });
 
   console.log("Seed : parametres...");
+  const whatsappUrl = process.env.NEXT_PUBLIC_WHATSAPP_URL || null;
+  const facebookUrl = process.env.NEXT_PUBLIC_FACEBOOK_URL || null;
   await prisma.parametre.upsert({
     where: { id: "principal" },
-    update: {},
+    // Seed idempotent : on rafraichit les liens depuis .env sans ecraser
+    // la banniere d'annonce eventuellement definie depuis l'admin.
+    update: {
+      whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "224600000000",
+      whatsappUrl,
+      facebookUrl,
+    },
     create: {
       id: "principal",
       whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "224600000000",
+      whatsappUrl,
+      facebookUrl,
     },
   });
 

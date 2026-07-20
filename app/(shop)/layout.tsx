@@ -4,19 +4,24 @@ import { Header } from "@/components/shop/header";
 import { MobileNav } from "@/components/shop/mobile-nav";
 import { PanierProvider } from "@/components/shop/panier-provider";
 import { WhatsappButton } from "@/components/shop/whatsapp-button";
-import { getParametres } from "@/lib/parametres";
+import { getParametres, urlWhatsApp } from "@/lib/parametres";
 
 export default async function ShopLayout({ children }: { children: React.ReactNode }) {
-  const { whatsapp, messageAnnonce } = await getParametres();
+  const parametres = await getParametres();
+  const whatsappHref = urlWhatsApp(parametres);
 
   return (
     <PanierProvider>
-      {messageAnnonce && <AnnonceBanner message={messageAnnonce} />}
+      {parametres.messageAnnonce && <AnnonceBanner message={parametres.messageAnnonce} />}
       <Header />
       <main className="flex-1 pb-16 md:pb-0">{children}</main>
-      <Footer whatsapp={whatsapp} />
+      <Footer
+        whatsapp={parametres.whatsapp}
+        whatsappHref={whatsappHref}
+        facebookUrl={parametres.facebookUrl}
+      />
       <MobileNav />
-      <WhatsappButton whatsapp={whatsapp} />
+      <WhatsappButton href={whatsappHref} />
     </PanierProvider>
   );
 }

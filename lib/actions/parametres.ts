@@ -17,14 +17,17 @@ export async function modifierParametres(input: unknown): Promise<ActionResultat
     return { ok: false, error: analyse.error.issues[0]?.message ?? "Formulaire invalide" };
   }
 
+  const donnees = {
+    whatsapp: analyse.data.whatsapp,
+    whatsappUrl: analyse.data.whatsappUrl?.trim() || null,
+    facebookUrl: analyse.data.facebookUrl?.trim() || null,
+    messageAnnonce: analyse.data.messageAnnonce || null,
+  };
+
   await prisma.parametre.upsert({
     where: { id: "principal" },
-    update: { whatsapp: analyse.data.whatsapp, messageAnnonce: analyse.data.messageAnnonce || null },
-    create: {
-      id: "principal",
-      whatsapp: analyse.data.whatsapp,
-      messageAnnonce: analyse.data.messageAnnonce || null,
-    },
+    update: donnees,
+    create: { id: "principal", ...donnees },
   });
 
   revalidatePath("/admin/parametres");

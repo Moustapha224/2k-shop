@@ -10,12 +10,15 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { modifierParametres } from "@/lib/actions/parametres";
 import { parametreSchema, type ParametreInput } from "@/lib/validations/parametre";
+import type { Parametres } from "@/lib/parametres";
 
-export function ParametresForm({ parametres }: { parametres: { whatsapp: string; messageAnnonce: string | null } }) {
+export function ParametresForm({ parametres }: { parametres: Parametres }) {
   const form = useForm<ParametreInput>({
     resolver: zodResolver(parametreSchema),
     defaultValues: {
       whatsapp: parametres.whatsapp,
+      whatsappUrl: parametres.whatsappUrl ?? "",
+      facebookUrl: parametres.facebookUrl ?? "",
       messageAnnonce: parametres.messageAnnonce ?? "",
     },
   });
@@ -37,6 +40,31 @@ export function ParametresForm({ parametres }: { parametres: { whatsapp: string;
           <Input id="whatsapp" placeholder="224620123456" {...form.register("whatsapp")} />
           <FieldDescription>Format international sans le &quot;+&quot;.</FieldDescription>
           <FieldError errors={[form.formState.errors.whatsapp]} />
+        </Field>
+
+        <Field data-invalid={!!form.formState.errors.whatsappUrl}>
+          <FieldLabel htmlFor="whatsappUrl">Lien WhatsApp (optionnel)</FieldLabel>
+          <Input
+            id="whatsappUrl"
+            placeholder="https://wa.me/message/XXXXXXXXXXX"
+            {...form.register("whatsappUrl")}
+          />
+          <FieldDescription>
+            Si renseigné, prioritaire sur le numéro pour le bouton flottant (ex :
+            lien à message pré-rempli WhatsApp Business).
+          </FieldDescription>
+          <FieldError errors={[form.formState.errors.whatsappUrl]} />
+        </Field>
+
+        <Field data-invalid={!!form.formState.errors.facebookUrl}>
+          <FieldLabel htmlFor="facebookUrl">Page Facebook (optionnel)</FieldLabel>
+          <Input
+            id="facebookUrl"
+            placeholder="https://www.facebook.com/..."
+            {...form.register("facebookUrl")}
+          />
+          <FieldDescription>Affichée dans le footer si renseignée.</FieldDescription>
+          <FieldError errors={[form.formState.errors.facebookUrl]} />
         </Field>
 
         <Field data-invalid={!!form.formState.errors.messageAnnonce}>
