@@ -30,13 +30,10 @@ export function HeroSlider({ slides }: HeroSliderProps) {
   useEffect(() => {
     if (slides.length <= 1) return;
 
-    // Un defilement automatique est un mouvement non sollicite : on le
-    // desactive pour qui a demande a reduire les animations.
-    const animationsReduites = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-    if (animationsReduites) return;
-
+    // Le defilement tourne toujours. Sous `prefers-reduced-motion`, ce n'est
+    // pas l'avancement qui est coupe mais le fondu : la classe
+    // `motion-reduce:transition-none` plus bas rend le changement instantane,
+    // ce qui supprime le mouvement sans priver personne du contenu.
     const timer = setTimeout(() => {
       setCurrentIndex((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
     }, 5000);

@@ -8,7 +8,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 /// Categorie de produits (Hauts, Pantalons, Chaussures...).
@@ -171,8 +171,8 @@ model Parametre {
 }
 
 /// Inscription a la newsletter (formulaire du footer).
-/// `email` est stocke en minuscules pour que l'unicite soit reellement
-/// insensible a la casse : SQLite compare @unique octet par octet.
+/// `email` est stocke en minuscules : @unique est sensible a la casse,
+/// deux graphies creeraient sinon deux lignes distinctes.
 model AbonneNewsletter {
   id        String   @id @default(cuid())
   email     String   @unique
