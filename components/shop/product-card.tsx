@@ -1,9 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { ImageOffIcon } from "lucide-react";
+import { ImageOffIcon, HeartIcon } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { formatGNF } from "@/lib/format";
 
 export type ProduitCarte = {
@@ -12,13 +12,15 @@ export type ProduitCarte = {
   prix: number;
   image: string | null;
   enRupture: boolean;
+  isNew?: boolean;
 };
 
 export function ProductCard({ produit }: { produit: ProduitCarte }) {
   return (
     <Link href={`/produits/${produit.slug}`} className="group block">
-      <Card className="gap-0 overflow-hidden p-0 transition-all duration-300 hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-md">
-        <div className="relative aspect-square w-full overflow-hidden bg-muted">
+      <div className="relative overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-gold/40 hover:shadow-md">
+        {/* Image */}
+        <div className="relative aspect-square w-full overflow-hidden bg-[#f7f5f0] dark:bg-muted">
           {produit.image ? (
             <Image
               src={produit.image}
@@ -32,17 +34,38 @@ export function ProductCard({ produit }: { produit: ProduitCarte }) {
               <ImageOffIcon className="size-8" />
             </div>
           )}
-          {produit.enRupture && (
-            <Badge variant="destructive" className="absolute top-2 left-2">
-              Rupture
-            </Badge>
+
+          {/* Badge NOUVEAU */}
+          {produit.isNew && !produit.enRupture && (
+            <span className="absolute top-2 left-2 rounded-md bg-gold px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">
+              Nouveau
+            </span>
           )}
+
+          {/* Badge rupture */}
+          {produit.enRupture && (
+            <span className="absolute top-2 left-2 rounded-md bg-destructive px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">
+              Rupture
+            </span>
+          )}
+
+          {/* Bouton cœur favori */}
+          <button
+            type="button"
+            aria-label="Ajouter aux favoris"
+            onClick={(e) => e.preventDefault()}
+            className="absolute top-2 right-2 flex size-7 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-sm opacity-0 transition-all group-hover:opacity-100 hover:bg-white active:scale-90"
+          >
+            <HeartIcon className="size-4 text-foreground/70" />
+          </button>
         </div>
-        <CardContent className="p-3">
-          <p className="line-clamp-1 text-sm font-medium">{produit.nom}</p>
-          <p className="mt-1 font-mono text-sm font-semibold">{formatGNF(produit.prix)}</p>
-        </CardContent>
-      </Card>
+
+        {/* Infos */}
+        <div className="p-3">
+          <p className="line-clamp-1 text-sm font-medium text-foreground">{produit.nom}</p>
+          <p className="mt-1 text-sm font-bold text-gold">{formatGNF(produit.prix)}</p>
+        </div>
+      </div>
     </Link>
   );
 }

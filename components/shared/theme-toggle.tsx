@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { useTheme } from "next-themes";
 import { MoonIcon, SunIcon } from "lucide-react";
 
@@ -11,13 +11,14 @@ import { Button } from "@/components/ui/button";
  * pour eviter un mismatch d'hydratation : tant que `mounted` est faux, le bouton
  * est rendu avec les deux icones cachees (structure inchangee, contenu vide).
  */
+/** References stables : sans elles, React se reabonnerait a chaque rendu. */
+const sabonner = () => () => {};
+const surLeClient = () => true;
+const surLeServeur = () => false;
+
 export function ThemeToggle({ className }: { className?: string }) {
   const { resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(sabonner, surLeClient, surLeServeur);
 
   const estSombre = mounted && resolvedTheme === "dark";
 

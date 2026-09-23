@@ -55,3 +55,7 @@ next-env.d.ts
 
 # client Prisma genere
 /generated/prisma
+
+# skills : .agents/ contient les vrais fichiers (portables) ; .claude/skills/
+# n'est qu'un lien symbolique en chemin absolu, propre a cette machine.
+/.claude/skills/

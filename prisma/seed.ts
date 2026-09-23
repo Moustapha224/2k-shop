@@ -222,6 +222,46 @@ async function main() {
     },
   });
 
+  console.log("Seed : slides hero...");
+  const slidesDefaut = [
+    {
+      titre: "Nouvelle Collection",
+      sousTitre: "Hauts, pantalons et chaussures livrés en 24h",
+      imageUrlExterne:
+        "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=900&q=80&auto=format&fit=crop",
+      ordre: 0,
+    },
+    {
+      titre: "Style Urbain",
+      sousTitre: "Des sneakers et baskets pour tous les jours",
+      imageUrlExterne:
+        "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=900&q=80&auto=format&fit=crop",
+      ordre: 1,
+    },
+    {
+      titre: "Mode Décontractée",
+      sousTitre: "Jeans, cargos et joggings confortables",
+      imageUrlExterne:
+        "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=900&q=80&auto=format&fit=crop",
+      ordre: 2,
+    },
+    {
+      titre: "Élégance Quotidienne",
+      sousTitre: "Chemises et polos pour toutes les occasions",
+      imageUrlExterne:
+        "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=900&q=80&auto=format&fit=crop",
+      ordre: 3,
+    },
+  ];
+  // On n'insère les slides que s'il n'en existe pas encore
+  // (pour ne pas écraser les slides ajoutées par l'admin)
+  const nbSlides = await prisma.slideHero.count();
+  if (nbSlides === 0) {
+    for (const slide of slidesDefaut) {
+      await prisma.slideHero.create({ data: slide });
+    }
+  }
+
   console.log("Seed termine.");
 }
 

@@ -9,7 +9,7 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
@@ -29,6 +29,7 @@ export function CheckoutForm({ communes }: { communes: Commune[] }) {
     defaultValues: {
       clientNom: "",
       clientTelephone: "",
+      clientEmail: "",
       communeId: "",
       quartier: "",
       adresse: "",
@@ -88,6 +89,40 @@ export function CheckoutForm({ communes }: { communes: Commune[] }) {
             {...form.register("clientTelephone")}
           />
           <FieldError errors={[form.formState.errors.clientTelephone]} />
+        </Field>
+
+        <Field data-invalid={!!form.formState.errors.clientEmail}>
+          <FieldLabel htmlFor="clientEmail">
+            Email <span className="text-muted-foreground">(facultatif)</span>
+          </FieldLabel>
+          <Input
+            id="clientEmail"
+            type="email"
+            autoComplete="email"
+            placeholder="vous@exemple.com"
+            {...form.register("clientEmail")}
+          />
+          <FieldDescription>
+            Pour recevoir la confirmation de votre commande et son suivi.
+          </FieldDescription>
+          <FieldError errors={[form.formState.errors.clientEmail]} />
+        </Field>
+
+        <Field data-invalid={!!form.formState.errors.clientEmail}>
+          <FieldLabel htmlFor="clientEmail">
+            Email <span className="text-muted-foreground">(facultatif)</span>
+          </FieldLabel>
+          <Input
+            id="clientEmail"
+            type="email"
+            autoComplete="email"
+            placeholder="vous@exemple.com"
+            {...form.register("clientEmail")}
+          />
+          <FieldDescription>
+            Pour recevoir la confirmation de votre commande par email.
+          </FieldDescription>
+          <FieldError errors={[form.formState.errors.clientEmail]} />
         </Field>
 
         <Field data-invalid={!!form.formState.errors.communeId}>

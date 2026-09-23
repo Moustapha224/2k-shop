@@ -88,6 +88,9 @@ model Commande {
 
   clientNom       String
   clientTelephone String
+  /// Optionnel : renseigne uniquement si le client veut une confirmation par
+  /// email. Le telephone reste l'identifiant de suivi.
+  clientEmail     String?
 
   communeId String
   commune   Commune @relation(fields: [communeId], references: [id])
@@ -138,6 +141,22 @@ model Admin {
   createdAt DateTime @default(now())
 }
 
+/// Slide du carrousel hero de la page d'accueil.
+/// imageUrl : chemin relatif dans /public (ex: /uploads/slides/xxx.jpg).
+/// imageUrlExterne : URL externe (Unsplash, CDN…) si pas d'upload local.
+/// ordre : ordre d'affichage (croissant).
+model SlideHero {
+  id              String  @id @default(cuid())
+  titre           String?
+  sousTitre       String?
+  imageUrl        String?
+  imageUrlExterne String?
+  ordre           Int     @default(0)
+  actif           Boolean @default(true)
+
+  createdAt DateTime @default(now())
+}
+
 /// Reglages de la boutique — une seule ligne (id fixe "principal").
 model Parametre {
   id              String   @id @default("principal")
@@ -149,4 +168,15 @@ model Parametre {
   facebookUrl     String?
   messageAnnonce  String?
   updatedAt       DateTime @updatedAt
+}
+
+/// Inscription a la newsletter (formulaire du footer).
+/// `email` est stocke en minuscules pour que l'unicite soit reellement
+/// insensible a la casse : SQLite compare @unique octet par octet.
+model AbonneNewsletter {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  actif     Boolean  @default(true)
+
+  createdAt DateTime @default(now())
 }

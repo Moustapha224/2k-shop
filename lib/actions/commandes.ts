@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/db";
-import { sendOrderNotification } from "@/lib/email";
+import { sendOrderConfirmation, sendOrderNotification } from "@/lib/email";
 import { normaliserTelephone } from "@/lib/format";
 import { PREFIXE_COMMANDE, SITE } from "@/lib/constants";
 import { checkoutSchema, suiviSchema } from "@/lib/validations/checkout";
@@ -12,6 +12,7 @@ import { checkoutSchema, suiviSchema } from "@/lib/validations/checkout";
 export type CreerCommandeInput = {
   clientNom: string;
   clientTelephone: string;
+  clientEmail?: string;
   communeId: string;
   quartier: string;
   adresse: string;
@@ -95,6 +96,7 @@ export async function creerCommande(input: CreerCommandeInput): Promise<ActionEc
         numero,
         clientNom: analyse.data.clientNom,
         clientTelephone: analyse.data.clientTelephone,
+        clientEmail: analyse.data.clientEmail || null,
         communeId: commune.id,
         quartier: analyse.data.quartier,
         adresse: analyse.data.adresse,
@@ -143,6 +145,33 @@ export async function creerCommande(input: CreerCommandeInput): Promise<ActionEc
   }).catch((erreur) => {
     console.error(`[commandes] Notification ${numero} en echec :`, erreur);
   });
+
+  // Confirmation au client, uniquement s'il a laisse une adresse.
+  // Meme logique fire-and-forget : la commande est validee, un incident
+  // d'envoi ne doit ni bloquer ni etre visible cote acheteur.
+  if (commande.clientEmail) {
+    sendOrderConfirmation({
+      numero: commande.numero,
+      clientNom: commande.clientNom,
+      clientEmail: commande.clientEmail,
+      communeNom: commune.nom,
+      quartier: commande.quartier,
+      adresse: commande.adresse,
+      sousTotal: commande.sousTotal,
+      fraisLivraison: commande.fraisLivraison,
+      total: commande.total,
+      createdAt: commande.createdAt,
+      lignes: lignes.map((l) => ({
+        nomProduit: l.nomProduit,
+        taille: l.taille,
+        quantite: l.quantite,
+        sousTotal: l.sousTotal,
+      })),
+      urlSuivi: `${SITE.url}/suivi/${commande.numero}?tel=${analyse.data.clientTelephone}`,
+    }).catch((erreur) => {
+      console.error(`[commandes] Confirmation client ${numero} en echec :`, erreur);
+    });
+  }
 
   revalidatePath("/admin/commandes");
   redirect(`/commande/confirmation/${numero}?tel=${analyse.data.clientTelephone}`);

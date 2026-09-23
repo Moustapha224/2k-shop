@@ -39,6 +39,14 @@ export default async function AdminCommandeDetailPage({ params }: Props) {
           <CardContent className="flex flex-col gap-1 text-sm">
             <p>{commande.clientNom}</p>
             <p className="text-muted-foreground">{formatTelephone(commande.clientTelephone)}</p>
+            {commande.clientEmail && (
+              <a
+                href={`mailto:${commande.clientEmail}`}
+                className="text-muted-foreground underline underline-offset-4 hover:text-foreground"
+              >
+                {commande.clientEmail}
+              </a>
+            )}
           </CardContent>
         </Card>
         <Card>

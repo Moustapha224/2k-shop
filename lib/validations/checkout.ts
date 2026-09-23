@@ -9,6 +9,18 @@ export const checkoutSchema = z.object({
     .trim()
     .transform(normaliserTelephone)
     .pipe(z.string().regex(/^\d{9}$/, "Numéro guinéen invalide (9 chiffres, ex: 620 12 34 56)")),
+  // Optionnel : sert uniquement a envoyer la confirmation de commande.
+  // Une chaine vide est acceptee et normalisee en `undefined` par l'action.
+  clientEmail: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .max(120, "Adresse email trop longue")
+    .refine(
+      (v) => v === "" || z.email().safeParse(v).success,
+      "Adresse email invalide"
+    )
+    .optional(),
   communeId: z.string().min(1, "Choisissez une commune"),
   quartier: z.string().trim().min(2, "Quartier requis").max(80, "Quartier trop long"),
   adresse: z.string().trim().min(3, "Adresse requise").max(200, "Adresse trop longue"),
