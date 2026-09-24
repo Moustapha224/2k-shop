@@ -221,33 +221,32 @@ async function main() {
   });
 
   console.log("Seed : slides hero...");
+  // Les 4 visuels livres avec le projet (public/slide/*.webp), versionnes dans
+  // le depot. On evite les URLs Unsplash : elles dependent d'un service tiers
+  // et ne correspondent pas a la boutique.
   const slidesDefaut = [
     {
       titre: "Nouvelle Collection",
-      sousTitre: "Hauts, pantalons et chaussures livrés en 24h",
-      imageUrlExterne:
-        "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=900&q=80&auto=format&fit=crop",
+      sousTitre: "Hauts, pantalons et chaussures livres en 24h",
+      imageUrl: "/slide/1.webp",
       ordre: 0,
     },
     {
       titre: "Style Urbain",
       sousTitre: "Des sneakers et baskets pour tous les jours",
-      imageUrlExterne:
-        "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=900&q=80&auto=format&fit=crop",
+      imageUrl: "/slide/2.webp",
       ordre: 1,
     },
     {
-      titre: "Mode Décontractée",
-      sousTitre: "Jeans, cargos et joggings confortables",
-      imageUrlExterne:
-        "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=900&q=80&auto=format&fit=crop",
+      titre: "Elegance",
+      sousTitre: "Chemises et polos pour toutes les occasions",
+      imageUrl: "/slide/3.webp",
       ordre: 2,
     },
     {
-      titre: "Élégance Quotidienne",
-      sousTitre: "Chemises et polos pour toutes les occasions",
-      imageUrlExterne:
-        "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=900&q=80&auto=format&fit=crop",
+      titre: "Streetwear",
+      sousTitre: "Jeans, cargos et joggings confortables",
+      imageUrl: "/slide/4.webp",
       ordre: 3,
     },
   ];
