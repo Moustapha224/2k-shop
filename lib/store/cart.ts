@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -76,11 +76,17 @@ export const usePanierStore = create<PanierStore>()(
 
 /** A utiliser une seule fois en haut de l'arbre (layout) pour declencher la rehydratation. */
 export function usePanierHydrate(): boolean {
-  const [hydrate, setHydrate] = useState(false);
+  // On s'abonne a l'evenement de rehydratation de zustand plutot que de poser un
+  // drapeau via setState dans l'effet : cela evite un rendu en cascade et reflete
+  // l'etat reel du store (le snapshot serveur reste `false` pour l'hydratation SSR).
+  const hydrate = useSyncExternalStore(
+    (cb) => usePanierStore.persist.onFinishHydration(cb),
+    () => usePanierStore.persist.hasHydrated(),
+    () => false
+  );
 
   useEffect(() => {
     usePanierStore.persist.rehydrate();
-    setHydrate(true);
   }, []);
 
   return hydrate;

@@ -112,17 +112,33 @@ continue à fonctionner (utile en dev).
 peut envoyer qu'au propriétaire du compte Resend). Pour une utilisation réelle,
 vérifier un domaine sur Resend puis régler `EMAIL_FROM="2K SHOP <commandes@votre-domaine.gn>"`.
 
+## Base de données
+
+PostgreSQL via [Neon](https://neon.com), avec l'adapter `@prisma/adapter-pg`.
+
+Mise en place depuis zéro :
+
+```bash
+# 1. Créer un projet sur neon.com, copier la chaîne de connexion *avec pooling*
+#    (l'hôte contient "-pooler") dans DATABASE_URL, côté .env
+# 2. Créer les tables
+npx prisma migrate deploy
+# 3. Données de départ (catégories, communes, produits, compte admin)
+npm run db:seed
+```
+
+Le seed lit `ADMIN_EMAIL` et `ADMIN_PASSWORD` et met le mot de passe à jour à
+chaque exécution.
+
 ## Déploiement
 
-Cible envisagée : Vercel + PostgreSQL managé (Neon ou Supabase). Deux points
-à traiter avant un déploiement en production :
+Cible : Vercel + Neon. Un point reste à traiter :
 
-- **Base de données** : passer `datasource.url` (dans `prisma.config.ts`) et
-  l'adapter Prisma de `@prisma/adapter-better-sqlite3` vers l'adapter
-  PostgreSQL correspondant, puis rejouer les migrations sur la base cible.
-- **Images produits** : l'upload admin écrit actuellement dans
-  `public/uploads/` via le système de fichiers du serveur (`lib/actions/
-  produits.ts`). Ça fonctionne en local ou sur un serveur Node.js classique,
-  mais **pas** sur une plateforme serverless comme Vercel (filesystem
-  éphémère) — il faudra migrer vers un stockage externe (Vercel Blob,
-  Cloudinary, S3...) avant de déployer dessus.
+- **Images produits et slides** : l'upload admin écrit dans `public/uploads/`
+  via le système de fichiers (`lib/actions/produits.ts`, `lib/actions/slides.ts`).
+  Cela fonctionne en local ou sur un serveur Node.js classique, mais **pas** sur
+  une plateforme serverless comme Vercel, dont le système de fichiers est en
+  lecture seule : l'upload échouera. Il faut passer par un stockage externe
+  (Vercel Blob, Cloudinary, S3…) avant d'ouvrir l'admin en production. Les
+  images déjà présentes dans `public/` sont servies normalement — c'est
+  l'écriture, pas la lecture, qui pose problème.

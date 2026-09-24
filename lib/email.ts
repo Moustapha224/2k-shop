@@ -1,15 +1,20 @@
 /**
  * Envoi d'emails (Resend).
  *
- * Charge le SDK et l'API key de maniere paresseuse : si aucune cle n'est
- * configuree, la fonction log un avertissement et rend `{ ok: false }` sans
- * lancer d'erreur. Cela permet au site de tourner en local sans clef Resend :
- * la commande est toujours creee, seule la notification est omise.
+ * IMPORTANT RESEND SANDBOX :
+ * Avec l'adresse `onboarding@resend.dev` (sandbox), Resend n'autorise
+ * l'envoi QU'À l'adresse email du compte Resend (pas à n'importe quelle
+ * adresse Gmail). Pour envoyer à `laminekeita923@gmail.com` depuis la sandbox,
+ * il faut que ce soit l'email du compte Resend lui-même.
+ *
+ * Solution recommandée en production : vérifier un domaine sur Resend et
+ * mettre EMAIL_FROM="2K SHOP <commandes@votre-domaine.gn>".
  */
 
 import "server-only";
 
 import { SITE } from "@/lib/constants";
+import { renderOrderConfirmation, type OrderConfirmationInput } from "@/lib/emails/order-confirmation";
 import { renderOrderNotification, type OrderNotificationInput } from "@/lib/emails/order-notification";
 
 export type EmailResult =
@@ -17,9 +22,9 @@ export type EmailResult =
   | { ok: false; reason: "not_configured" | "send_failed"; error?: string };
 
 /**
- * Adresse d'expedition. Defaut : sandbox Resend (utilisable sans domaine
- * verifie, limite a l'adresse du proprietaire du compte). En production,
- * verifier un domaine puis regler EMAIL_FROM sur `commandes@votre-domaine.gn`.
+ * Adresse d'expédition.
+ * Par défaut : sandbox Resend (uniquement vers l'email du compte Resend).
+ * En production : mettre EMAIL_FROM="2K SHOP <commandes@votre-domaine.gn>"
  */
 function adresseExpediteur(): string {
   const from = process.env.EMAIL_FROM?.trim();
@@ -27,7 +32,7 @@ function adresseExpediteur(): string {
   return `${SITE.nom} <onboarding@resend.dev>`;
 }
 
-/** Adresse du proprietaire, destinataire des notifications de commande. */
+/** Adresse du propriétaire, destinataire des notifications de commande. */
 function adresseDestinataire(): string | null {
   return (
     process.env.NOTIFICATION_EMAIL?.trim() ||
@@ -37,47 +42,47 @@ function adresseDestinataire(): string | null {
 }
 
 /**
- * Envoie la notification "nouvelle commande" au proprietaire.
- * Ne lance jamais d'exception : les erreurs sont retournees sous forme d'objet
- * pour que l'appelant puisse decider (log, retry...).
+ * Envoie la notification "nouvelle commande" au propriétaire.
+ * Ne lance jamais d'exception : les erreurs sont retournées sous forme d'objet.
  */
 export async function sendOrderNotification(
   input: OrderNotificationInput
 ): Promise<EmailResult> {
   const apiKey = process.env.RESEND_API_KEY?.trim();
   const destinataire = adresseDestinataire();
+  const expediteur = adresseExpediteur();
 
   if (!apiKey) {
     console.warn(
-      `[email] RESEND_API_KEY absente — notification de commande ${input.numero} non envoyee.`
+      `[email] RESEND_API_KEY absente — notification commande ${input.numero} non envoyée.`
     );
     return { ok: false, reason: "not_configured" };
   }
 
   if (!destinataire) {
     console.warn(
-      `[email] Aucun destinataire (NOTIFICATION_EMAIL ni ADMIN_EMAIL) — notification ${input.numero} non envoyee.`
+      `[email] Aucun destinataire configuré (NOTIFICATION_EMAIL / ADMIN_EMAIL) — notification ${input.numero} non envoyée.`
     );
     return { ok: false, reason: "not_configured" };
   }
 
-  // Import dynamique : evite de charger le SDK inutilement quand la cle
-  // n'est pas configuree (build plus leger, moins de code cote worker).
+  console.info(
+    `[email] Envoi notification commande ${input.numero} → ${destinataire} (from: ${expediteur})`
+  );
+
+  // Import dynamique pour alléger le bundle quand Resend n'est pas utilisé.
   const { Resend } = await import("resend");
   const resend = new Resend(apiKey);
 
   const { subject, html, text } = renderOrderNotification(input);
 
   const { data, error } = await resend.emails.send({
-    from: adresseExpediteur(),
+    from: expediteur,
     to: [destinataire],
     subject,
     html,
     text,
-    replyTo: input.clientTelephone
-      ? undefined // pas d'email client — on ne peut pas repondre au client par mail
-      : undefined,
-    // Tag pour retrouver ces emails cote Resend / analytics.
+    // Tags pour retrouver ces emails dans le dashboard Resend.
     tags: [
       { name: "type", value: "order_notification" },
       { name: "commande", value: input.numero },
@@ -85,9 +90,83 @@ export async function sendOrderNotification(
   });
 
   if (error) {
-    console.error(`[email] Echec envoi notification ${input.numero} :`, error);
-    return { ok: false, reason: "send_failed", error: String(error.message ?? error) };
+    // Resend renvoie souvent un message utile : "You can only send testing
+    // emails to your own email address" en mode sandbox.
+    const msg = typeof error === "object" && "message" in error
+      ? String((error as { message: unknown }).message)
+      : String(error);
+    console.error(
+      `[email] Échec envoi notification ${input.numero} :`,
+      msg,
+      "\n⚠️  Si vous voyez 'testing emails', l'adresse destinataire doit être l'email du compte Resend, ou vérifiez un domaine sur resend.com/domains."
+    );
+    return { ok: false, reason: "send_failed", error: msg };
   }
 
+  console.info(
+    `[email] ✅ Notification commande ${input.numero} envoyée. ID Resend: ${data?.id}`
+  );
+  return { ok: true, id: data?.id ?? "" };
+}
+
+
+/**
+ * Envoie au CLIENT la confirmation de sa commande.
+ *
+ * Contrairement a la notification proprietaire, le destinataire vient d'une
+ * saisie client : en sandbox Resend (`onboarding@resend.dev`), l'envoi echouera
+ * pour toute adresse autre que celle du compte Resend. C'est attendu, et sans
+ * consequence — la commande est deja enregistree, l'erreur est seulement loggee.
+ * Ne lance jamais d'exception.
+ */
+export async function sendOrderConfirmation(
+  input: OrderConfirmationInput
+): Promise<EmailResult> {
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  const expediteur = adresseExpediteur();
+
+  if (!apiKey) {
+    console.warn(
+      `[email] RESEND_API_KEY absente — confirmation client ${input.numero} non envoyee.`
+    );
+    return { ok: false, reason: "not_configured" };
+  }
+
+  console.info(
+    `[email] Envoi confirmation client ${input.numero} -> ${input.clientEmail} (from: ${expediteur})`
+  );
+
+  const { Resend } = await import("resend");
+  const resend = new Resend(apiKey);
+
+  const { subject, html, text } = renderOrderConfirmation(input);
+
+  const { data, error } = await resend.emails.send({
+    from: expediteur,
+    to: [input.clientEmail],
+    subject,
+    html,
+    text,
+    tags: [
+      { name: "type", value: "order_confirmation" },
+      { name: "commande", value: input.numero },
+    ],
+  });
+
+  if (error) {
+    const msg = typeof error === "object" && "message" in error
+      ? String((error as { message: unknown }).message)
+      : String(error);
+    console.error(
+      `[email] Echec envoi confirmation client ${input.numero} :`,
+      msg,
+      "\n⚠️  En sandbox Resend, seul l'email du compte peut recevoir. Verifiez un domaine sur resend.com/domains pour ecrire a vos clients."
+    );
+    return { ok: false, reason: "send_failed", error: msg };
+  }
+
+  console.info(
+    `[email] ✅ Confirmation client ${input.numero} envoyee. ID Resend: ${data?.id}`
+  );
   return { ok: true, id: data?.id ?? "" };
 }

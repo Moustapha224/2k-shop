@@ -10,6 +10,13 @@ export const SITE = {
   whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "224600000000",
 } as const;
 
+/**
+ * Hôtes autorisés pour les images distantes (slides du carrousel).
+ * Doit rester aligné sur `images.remotePatterns` dans next.config.ts : une URL
+ * d'un autre hôte ferait planter le rendu de `next/image`.
+ */
+export const HOTES_IMAGES_DISTANTES = ["images.unsplash.com"] as const;
+
 /** Préfixe des numéros de commande : 2K-2026-0001 */
 export const PREFIXE_COMMANDE = "2K";
 

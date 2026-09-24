@@ -9,6 +9,7 @@ import {
   SettingsIcon,
   ShoppingCartIcon,
   TagIcon,
+  ImagesIcon,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -18,6 +19,7 @@ const LIENS = [
   { href: "/admin/commandes", label: "Commandes", icone: ShoppingCartIcon },
   { href: "/admin/produits", label: "Produits", icone: PackageIcon },
   { href: "/admin/categories", label: "Catégories", icone: TagIcon },
+  { href: "/admin/slides", label: "Slides", icone: ImagesIcon },
   { href: "/admin/communes", label: "Communes", icone: MapIcon },
   { href: "/admin/parametres", label: "Paramètres", icone: SettingsIcon },
 ] as const;

@@ -9,48 +9,56 @@ import { SITE } from "@/lib/constants";
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
-      <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between gap-3 px-4">
+    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/90 shadow-sm">
+      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4">
+        {/* Logo + nom */}
         <Link
           href="/"
-          className="flex items-center gap-2 transition-opacity hover:opacity-80"
+          className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
         >
           <Image
             src="/logo.jpeg"
             alt={`Logo ${SITE.nom}`}
-            width={32}
-            height={32}
-            className="size-8 rounded-md object-contain dark:bg-white dark:p-0.5"
+            width={36}
+            height={36}
+            className="size-9 rounded-lg object-contain dark:bg-white dark:p-0.5 shadow-sm"
             priority
           />
-          <span className="font-semibold tracking-tight">{SITE.nom}</span>
+          <div className="flex flex-col leading-none">
+            <span className="text-base font-bold tracking-tight">{SITE.nom}</span>
+            <span className="text-[10px] font-medium tracking-[0.18em] uppercase text-gold">
+              {SITE.slogan}
+            </span>
+          </div>
         </Link>
 
-        <nav className="hidden items-center gap-5 text-sm font-medium md:flex">
+        {/* Navigation centrale */}
+        <nav className="hidden items-center gap-8 text-sm font-medium md:flex">
           <Link
             href="/produits"
-            className="text-muted-foreground transition-colors hover:text-foreground"
+            className="relative text-foreground/80 transition-colors hover:text-foreground after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-gold after:transition-all hover:after:w-full"
           >
             Produits
           </Link>
           <Link
             href="/suivi"
-            className="text-muted-foreground transition-colors hover:text-foreground"
+            className="relative text-foreground/80 transition-colors hover:text-foreground after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-gold after:transition-all hover:after:w-full"
           >
             Suivi de commande
           </Link>
         </nav>
 
+        {/* Actions droite */}
         <div className="flex items-center gap-1">
           <ThemeToggle className="relative" />
           <Button variant="ghost" size="icon" asChild className="hidden md:inline-flex">
             <Link href="/suivi" aria-label="Suivi de commande">
-              <PackageSearchIcon />
+              <PackageSearchIcon className="size-5" />
             </Link>
           </Button>
           <Button variant="ghost" size="icon" asChild className="relative">
             <Link href="/panier" aria-label="Panier">
-              <ShoppingBagIcon />
+              <ShoppingBagIcon className="size-5" />
               <PanierBadge />
             </Link>
           </Button>

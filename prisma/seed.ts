@@ -11,16 +11,14 @@
 // (npm run db:seed) et pas via prisma.config.ts.
 import "dotenv/config";
 
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 import { PrismaClient } from "../generated/prisma/client";
 import { TAILLES_VETEMENT, TAILLES_CHAUSSURE } from "../lib/constants";
 import { slugifier } from "../lib/slug";
 import bcrypt from "bcryptjs";
 
-const adapter = new PrismaBetterSqlite3({
-  url: process.env.DATABASE_URL ?? "file:./dev.db",
-});
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
 const COMMUNES = [
@@ -221,6 +219,45 @@ async function main() {
       facebookUrl,
     },
   });
+
+  console.log("Seed : slides hero...");
+  // Les 4 visuels livres avec le projet (public/slide/*.webp), versionnes dans
+  // le depot. On evite les URLs Unsplash : elles dependent d'un service tiers
+  // et ne correspondent pas a la boutique.
+  const slidesDefaut = [
+    {
+      titre: "Nouvelle Collection",
+      sousTitre: "Hauts, pantalons et chaussures livres en 24h",
+      imageUrl: "/slide/1.webp",
+      ordre: 0,
+    },
+    {
+      titre: "Style Urbain",
+      sousTitre: "Des sneakers et baskets pour tous les jours",
+      imageUrl: "/slide/2.webp",
+      ordre: 1,
+    },
+    {
+      titre: "Elegance",
+      sousTitre: "Chemises et polos pour toutes les occasions",
+      imageUrl: "/slide/3.webp",
+      ordre: 2,
+    },
+    {
+      titre: "Streetwear",
+      sousTitre: "Jeans, cargos et joggings confortables",
+      imageUrl: "/slide/4.webp",
+      ordre: 3,
+    },
+  ];
+  // On n'insère les slides que s'il n'en existe pas encore
+  // (pour ne pas écraser les slides ajoutées par l'admin)
+  const nbSlides = await prisma.slideHero.count();
+  if (nbSlides === 0) {
+    for (const slide of slidesDefaut) {
+      await prisma.slideHero.create({ data: slide });
+    }
+  }
 
   console.log("Seed termine.");
 }
