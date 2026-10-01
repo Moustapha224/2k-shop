@@ -10,22 +10,45 @@ export type Parametres = {
   messageAnnonce: string | null;
 };
 
+/** Valeurs de repli, tirees des constantes et de l'environnement. */
+function parametresParDefaut(): Parametres {
+  return {
+    whatsapp: SITE.whatsapp,
+    whatsappUrl: process.env.NEXT_PUBLIC_WHATSAPP_URL ?? null,
+    facebookUrl: process.env.NEXT_PUBLIC_FACEBOOK_URL ?? null,
+    messageAnnonce: null,
+  };
+}
+
 /**
  * Reglages boutique (numero WhatsApp, banniere d'annonce, liens sociaux).
- * Repli sur les constantes et variables d'environnement si l'enregistrement
- * n'existe pas encore.
+ *
+ * Appelee par le layout de la boutique, donc executee pour CHAQUE page, y
+ * compris celles generees statiquement au build (/aide, /a-propos...). Une
+ * exception ici ferait echouer le build entier alors qu'il ne s'agit que de
+ * reglages d'affichage, tous pourvus d'un repli. On intercepte donc l'erreur
+ * au lieu de la laisser remonter : le site se construit et fonctionne, et
+ * l'incident reste visible dans les logs serveur.
  */
 export async function getParametres(): Promise<Parametres> {
-  const parametre = await prisma.parametre.findUnique({ where: { id: "principal" } });
+  const defauts = parametresParDefaut();
 
-  return {
-    whatsapp: parametre?.whatsapp ?? SITE.whatsapp,
-    whatsappUrl:
-      parametre?.whatsappUrl ?? process.env.NEXT_PUBLIC_WHATSAPP_URL ?? null,
-    facebookUrl:
-      parametre?.facebookUrl ?? process.env.NEXT_PUBLIC_FACEBOOK_URL ?? null,
-    messageAnnonce: parametre?.messageAnnonce ?? null,
-  };
+  try {
+    const parametre = await prisma.parametre.findUnique({ where: { id: "principal" } });
+
+    return {
+      whatsapp: parametre?.whatsapp ?? defauts.whatsapp,
+      whatsappUrl: parametre?.whatsappUrl ?? defauts.whatsappUrl,
+      facebookUrl: parametre?.facebookUrl ?? defauts.facebookUrl,
+      messageAnnonce: parametre?.messageAnnonce ?? defauts.messageAnnonce,
+    };
+  } catch (erreur) {
+    console.error(
+      "[parametres] Lecture impossible, repli sur les valeurs par defaut :",
+      erreur instanceof Error ? erreur.message : erreur
+    );
+    return defauts;
+  }
 }
 
 /**
