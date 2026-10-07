@@ -9,6 +9,17 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: import.meta.dirname,
   },
+  experimental: {
+    serverActions: {
+      // Next plafonne le corps d'une Server Action a 1 Mo par defaut : un envoi
+      // d'image depuis l'admin etait rejete en 413 avant meme d'atteindre notre
+      // code, d'ou une erreur opaque cote navigateur.
+      // 6 Mo laisse passer nos 5 Mo (lib/storage.ts) plus l'encodage multipart,
+      // que la doc Next chiffre a 10-20 Ko. La vraie limite reste donc la notre,
+      // avec son message lisible.
+      bodySizeLimit: "6mb",
+    },
+  },
   images: {
     // La cible est un smartphone Android sur connexion lente : l'AVIF pèse
     // sensiblement moins que le WebP, au prix d'un encodage plus lent (mis en
