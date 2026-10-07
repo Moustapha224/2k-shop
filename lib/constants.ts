@@ -11,11 +11,22 @@ export const SITE = {
 } as const;
 
 /**
- * Hôtes autorisés pour les images distantes (slides du carrousel).
- * Doit rester aligné sur `images.remotePatterns` dans next.config.ts : une URL
- * d'un autre hôte ferait planter le rendu de `next/image`.
+ * Hôtes autorisés pour les images distantes (slides, visuels produits).
+ *
+ * Source unique de vérité, partagée par `images.remotePatterns`
+ * (next.config.ts) et la validation des formulaires admin : une URL d'un autre
+ * hôte ferait planter le rendu de `next/image` et tomber la page concernée.
+ *
+ * L'hôte du stockage objet y est ajouté quand il est configuré. Il doit passer
+ * par une variable `NEXT_PUBLIC_` : la validation tourne aussi dans le
+ * navigateur, où `AWS_ENDPOINT_URL_S3` n'existe pas.
  */
-export const HOTES_IMAGES_DISTANTES = ["images.unsplash.com"] as const;
+export const HOTES_IMAGES_DISTANTES: readonly string[] = [
+  "images.unsplash.com",
+  ...(process.env.NEXT_PUBLIC_STORAGE_HOST?.trim()
+    ? [process.env.NEXT_PUBLIC_STORAGE_HOST.trim()]
+    : []),
+];
 
 /** Préfixe des numéros de commande : 2K-2026-0001 */
 export const PREFIXE_COMMANDE = "2K";

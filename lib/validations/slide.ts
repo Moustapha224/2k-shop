@@ -7,13 +7,27 @@ const HOTES_AUTORISES: readonly string[] = HOTES_IMAGES_DISTANTES;
 export const slideSchema = z.object({
   titre: z.string().trim().max(100, "Titre trop long").optional().or(z.literal("")),
   sousTitre: z.string().trim().max(200, "Sous-titre trop long").optional().or(z.literal("")),
-  // Chemin servi depuis /public : doit rester relatif, sinon next/image refuse la source.
+  // Deux formes legitimes depuis que l'upload passe par le stockage objet :
+  // un chemin relatif servi depuis /public (mode local, ou saisie manuelle),
+  // ou l'URL absolue renvoyee par le bucket. Tout autre hote est refuse :
+  // next/image jetterait a l'execution et ferait tomber la page d'accueil.
   imageUrl: z
     .string()
     .trim()
-    .refine((valeur) => valeur === "" || valeur.startsWith("/"), {
-      message: "Chemin local invalide (doit commencer par «/», ex: /slide/1.png)",
-    })
+    .refine(
+      (valeur) => {
+        if (valeur === "" || valeur.startsWith("/")) return true;
+        try {
+          return HOTES_AUTORISES.includes(new URL(valeur).hostname);
+        } catch {
+          return false;
+        }
+      },
+      {
+        message:
+          "Doit être un chemin local commençant par «/» (ex: /slide/1.png) ou une URL d'un hôte autorisé",
+      }
+    )
     .optional()
     .or(z.literal("")),
   // Une URL distante n'est affichable que si son hote figure dans
