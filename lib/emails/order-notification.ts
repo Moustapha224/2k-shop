@@ -146,7 +146,7 @@ export function renderOrderNotification(input: OrderNotificationInput): Prepared
             <!-- Bouton admin -->
             <tr>
               <td style="padding:16px 24px 24px;" align="center">
-                <a href="${e(input.urlAdmin)}" style="display:inline-block;padding:12px 20px;background:#111;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;">Ouvrir dans l'admin</a>
+                <a href="${e(input.urlAdmin)}" style="display:inline-block;padding:12px 20px;background:#111;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;">Voir et confirmer la commande</a>
                 <div style="margin-top:12px;font-size:12px;color:#71717a;">Paiement à la livraison — ${formatGNF(input.total)} à encaisser en espèces.</div>
               </td>
             </tr>
@@ -186,7 +186,7 @@ export function renderOrderNotification(input: OrderNotificationInput): Prepared
     ``,
     `Paiement a la livraison en especes.`,
     ``,
-    `Ouvrir dans l'admin : ${input.urlAdmin}`,
+    `Voir et confirmer la commande : ${input.urlAdmin}`,
   ]
     .filter((ligne): ligne is string => ligne !== null)
     .join("\n");

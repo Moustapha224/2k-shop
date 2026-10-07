@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { ConfirmerCommandeButton } from "@/components/admin/confirmer-commande-button";
 import { StatutSelect } from "@/components/admin/statut-select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -28,7 +29,14 @@ export default async function AdminCommandeDetailPage({ params }: Props) {
           <h1 className="text-xl font-semibold tracking-tight">Commande {commande.numero}</h1>
           <p className="text-sm text-muted-foreground">{formatDateHeure(commande.createdAt)}</p>
         </div>
-        <StatutSelect commandeId={commande.id} statutActuel={commande.statut as StatutCommande} />
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Raccourci affiche seulement tant que la commande attend : une fois
+              confirmee, le selecteur suffit pour les etapes suivantes. */}
+          {commande.statut === "EN_ATTENTE" && (
+            <ConfirmerCommandeButton commandeId={commande.id} />
+          )}
+          <StatutSelect commandeId={commande.id} statutActuel={commande.statut as StatutCommande} />
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">

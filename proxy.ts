@@ -14,7 +14,11 @@ export default auth((req) => {
   const estPageLogin = pathname === "/admin/login";
 
   if (!estConnecte && !estPageLogin) {
-    return NextResponse.redirect(new URL("/admin/login", req.nextUrl.origin));
+    const versLogin = new URL("/admin/login", req.nextUrl.origin);
+    // On conserve la destination : sans cela, un lien profond — typiquement
+    // celui d'un email de commande — ramenait toujours au tableau de bord.
+    versLogin.searchParams.set("callbackUrl", pathname + req.nextUrl.search);
+    return NextResponse.redirect(versLogin);
   }
 
   if (estConnecte && estPageLogin) {

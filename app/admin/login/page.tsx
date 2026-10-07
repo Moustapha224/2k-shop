@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
 
@@ -21,7 +22,11 @@ export default function AdminLoginPage() {
           <h1 className="text-lg font-semibold tracking-tight">Administration</h1>
           <p className="text-sm text-muted-foreground">{SITE.nom}</p>
         </div>
-        <LoginForm />
+        {/* LoginForm lit `callbackUrl` via useSearchParams : sans frontiere
+            Suspense, Next refuse de prerendre cette page statiquement. */}
+        <Suspense fallback={null}>
+          <LoginForm />
+        </Suspense>
       </div>
     </div>
   );
