@@ -15,6 +15,7 @@ import "server-only";
 
 import { SITE } from "@/lib/constants";
 import { renderOrderConfirmation, type OrderConfirmationInput } from "@/lib/emails/order-confirmation";
+import { renderOrderStatus, type OrderStatusInput } from "@/lib/emails/order-status";
 import { renderOrderNotification, type OrderNotificationInput } from "@/lib/emails/order-notification";
 
 export type EmailResult =
@@ -168,5 +169,56 @@ export async function sendOrderConfirmation(
   console.info(
     `[email] ✅ Confirmation client ${input.numero} envoyee. ID Resend: ${data?.id}`
   );
+  return { ok: true, id: data?.id ?? "" };
+}
+
+
+/**
+ * Previent le CLIENT que le statut de sa commande a change.
+ *
+ * Meme contrat que les autres envois : ne leve jamais, et se tait proprement
+ * si Resend n'est pas configure. En sandbox Resend, seule l'adresse du compte
+ * peut recevoir — tant qu'un domaine n'est pas verifie, l'envoi echouera pour
+ * un vrai client, et c'est attendu.
+ */
+export async function sendOrderStatus(input: OrderStatusInput): Promise<EmailResult> {
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  const expediteur = adresseExpediteur();
+
+  if (!apiKey) {
+    console.warn(
+      `[email] RESEND_API_KEY absente — changement de statut ${input.numero} non notifie.`
+    );
+    return { ok: false, reason: "not_configured" };
+  }
+
+  console.info(
+    `[email] Envoi statut ${input.statut} pour ${input.numero} -> ${input.clientEmail}`
+  );
+
+  const { Resend } = await import("resend");
+  const resend = new Resend(apiKey);
+  const { subject, html, text } = renderOrderStatus(input);
+
+  const { data, error } = await resend.emails.send({
+    from: expediteur,
+    to: [input.clientEmail],
+    subject,
+    html,
+    text,
+    tags: [
+      { name: "type", value: "order_status" },
+      { name: "commande", value: input.numero },
+    ],
+  });
+
+  if (error) {
+    const msg = typeof error === "object" && "message" in error
+      ? String((error as { message: unknown }).message)
+      : String(error);
+    console.error(`[email] Echec notification statut ${input.numero} :`, msg);
+    return { ok: false, reason: "send_failed", error: msg };
+  }
+
   return { ok: true, id: data?.id ?? "" };
 }

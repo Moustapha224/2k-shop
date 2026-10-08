@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { ShoppingBagIcon } from "lucide-react";
 import { toast } from "sonner";
 
@@ -17,6 +18,7 @@ export function AddToCartForm({
   produit: { id: string; slug: string; nom: string; prixUnitaire: number; image: string | null };
   variantes: Variante[];
 }) {
+  const router = useRouter();
   const [tailleId, setTailleId] = useState<string | null>(null);
   const ajouter = usePanierStore((state) => state.ajouter);
 
@@ -35,7 +37,12 @@ export function AddToCartForm({
       prixUnitaire: produit.prixUnitaire,
       stockDisponible: selectionnee.stock,
     });
-    toast.success(`${produit.nom} (${selectionnee.taille}) ajouté au panier`);
+    // Le toast porte l'action : ajouter un article sans proposer la suite
+    // obligeait a retrouver l'icone du panier en haut de page.
+    toast.success(`${produit.nom} (${selectionnee.taille}) ajouté au panier`, {
+      action: { label: "Voir le panier", onClick: () => router.push("/panier") },
+      duration: 6000,
+    });
   }
 
   return (
