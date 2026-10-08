@@ -48,7 +48,7 @@ export function Footer({
               />
               <div>
                 <p className="text-sm font-bold">{SITE.nom}</p>
-                <p className="text-[10px] font-medium tracking-[0.18em] uppercase text-gold">
+                <p className="text-[10px] font-medium tracking-[0.18em] uppercase text-gold-ink">
                   {SITE.slogan}
                 </p>
               </div>
@@ -71,7 +71,7 @@ export function Footer({
               <Link
                 key={href}
                 href={href}
-                className="text-xs text-muted-foreground transition-colors hover:text-gold"
+                className="text-xs text-muted-foreground transition-colors hover:text-gold-ink"
               >
                 {label}
               </Link>
@@ -90,7 +90,7 @@ export function Footer({
               <Link
                 key={label}
                 href={href}
-                className="text-xs text-muted-foreground transition-colors hover:text-gold"
+                className="text-xs text-muted-foreground transition-colors hover:text-gold-ink"
               >
                 {label}
               </Link>
@@ -104,14 +104,14 @@ export function Footer({
               href={whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-gold"
+              className="inline-flex items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-gold-ink"
             >
               <PhoneIcon className="size-3.5" />
               {formatTelephone(whatsapp)}
             </a>
             <a
               href="mailto:contact@2kshop.com"
-              className="inline-flex items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-gold"
+              className="inline-flex items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-gold-ink"
             >
               <MailIcon className="size-3.5" />
               contact@2kshop.com
@@ -130,7 +130,7 @@ export function Footer({
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Facebook"
-                    className="flex size-8 items-center justify-center rounded-lg border border-border/60 bg-card text-muted-foreground transition-all hover:border-gold/40 hover:text-gold hover:shadow-sm"
+                    className="flex size-8 items-center justify-center rounded-lg border border-border/60 bg-card text-muted-foreground transition-all hover:border-gold/40 hover:text-gold-ink hover:shadow-sm"
                   >
                     <FacebookIcon className="size-4" />
                   </a>
@@ -140,7 +140,7 @@ export function Footer({
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Instagram"
-                  className="flex size-8 items-center justify-center rounded-lg border border-border/60 bg-card text-muted-foreground transition-all hover:border-gold/40 hover:text-gold hover:shadow-sm"
+                  className="flex size-8 items-center justify-center rounded-lg border border-border/60 bg-card text-muted-foreground transition-all hover:border-gold/40 hover:text-gold-ink hover:shadow-sm"
                 >
                   <InstagramIcon className="size-4" />
                 </a>

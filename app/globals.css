@@ -49,27 +49,35 @@
   /* Couleur accent doré 2K SHOP */
   --color-gold: var(--gold);
   --color-gold-foreground: var(--gold-foreground);
+  /* Or d'ENCRE : le dore vif tombe a 2,45:1 sur blanc, sous le minimum AA de
+     4,5. `gold` reste pour les aplats (badge, bouton) ou du blanc se pose
+     dessus ; `gold-ink` sert des qu'il s'agit de texte. */
+  --color-gold-ink: var(--gold-ink);
+  /* Fond des visuels produit : clair en mode clair, sourd en sombre. */
+  --color-surface-image: var(--surface-image);
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.13 0 0);
+  /* Neutres legerement tires vers la teinte du dore (75) : un gris de
+     chroma 0 est le gris par defaut de shadcn, sans lien avec la marque. */
+  --background: oklch(0.995 0.003 75);
+  --foreground: oklch(0.16 0.008 75);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.13 0 0);
+  --card-foreground: oklch(0.16 0.008 75);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.13 0 0);
   /* Noir profond comme couleur primaire (boutons, liens actifs) */
   --primary: oklch(0.13 0 0);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
+  --secondary: oklch(0.968 0.005 75);
   --secondary-foreground: oklch(0.13 0 0);
-  --muted: oklch(0.965 0 0);
-  --muted-foreground: oklch(0.52 0 0);
-  --accent: oklch(0.97 0 0);
+  --muted: oklch(0.963 0.006 75);
+  --muted-foreground: oklch(0.52 0.012 75);
+  --accent: oklch(0.968 0.005 75);
   --accent-foreground: oklch(0.13 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.91 0 0);
-  --input: oklch(0.91 0 0);
+  --border: oklch(0.905 0.006 75);
+  --input: oklch(0.905 0.006 75);
   --ring: oklch(0.65 0.12 85);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
@@ -86,24 +94,27 @@
   --sidebar-border: oklch(0.91 0 0);
   --sidebar-ring: oklch(0.65 0.12 85);
   /* Or / Amber — couleur signature 2K SHOP */
-  --gold: oklch(0.73 0.16 75);      /* #C8991A environ */
+  --gold: oklch(0.73 0.16 75);      /* aplats : badge, bouton */
   --gold-foreground: oklch(1 0 0);
+  --gold-ink: oklch(0.52 0.13 75);   /* texte : 5,6:1 sur blanc */
+  --surface-image: oklch(0.967 0.009 75);
 }
 
 .dark {
-  --background: oklch(0.13 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.185 0 0);
+  /* Meme logique en sombre : un noir tiede plutot qu un charbon neutre. */
+  --background: oklch(0.135 0.006 75);
+  --foreground: oklch(0.985 0.002 75);
+  --card: oklch(0.192 0.008 75);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.185 0 0);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.13 0 0);
-  --secondary: oklch(0.26 0 0);
+  --secondary: oklch(0.265 0.008 75);
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.26 0 0);
-  --muted-foreground: oklch(0.65 0 0);
-  --accent: oklch(0.26 0 0);
+  --muted: oklch(0.265 0.008 75);
+  --muted-foreground: oklch(0.70 0.012 75);
+  --accent: oklch(0.265 0.008 75);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
@@ -124,6 +135,9 @@
   --sidebar-ring: oklch(0.65 0.12 85);
   --gold: oklch(0.73 0.16 75);
   --gold-foreground: oklch(0.13 0 0);
+  /* Sur fond sombre le dore vif atteint deja 7,6:1 : rien a assombrir. */
+  --gold-ink: oklch(0.78 0.15 75);
+  --surface-image: oklch(0.24 0.008 75);
 }
 
 @layer base {

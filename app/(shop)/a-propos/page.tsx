@@ -50,7 +50,7 @@ export default function AProposPage() {
               key={titre}
               className="flex gap-3 rounded-xl border border-border bg-card p-4"
             >
-              <Icone className="mt-0.5 size-5 shrink-0 text-gold" aria-hidden="true" />
+              <Icone className="mt-0.5 size-5 shrink-0 text-gold-ink" aria-hidden="true" />
               <div className="flex flex-col gap-1">
                 <p className="text-sm font-semibold">{titre}</p>
                 <p className="text-sm leading-relaxed text-muted-foreground">{texte}</p>
@@ -67,7 +67,7 @@ export default function AProposPage() {
           permet de vérifier la disponibilité de votre taille et de convenir avec vous du
           moment de la livraison. Vous pouvez suivre l&apos;avancement de votre commande à
           tout moment depuis la page{" "}
-          <Link href="/suivi" className="font-medium text-gold underline underline-offset-4">
+          <Link href="/suivi" className="font-medium text-gold-ink underline underline-offset-4">
             suivi de commande
           </Link>
           .
@@ -78,11 +78,11 @@ export default function AProposPage() {
         <h2 className="text-base font-semibold tracking-tight">Une question ?</h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
           Consultez notre{" "}
-          <Link href="/aide" className="font-medium text-gold underline underline-offset-4">
+          <Link href="/aide" className="font-medium text-gold-ink underline underline-offset-4">
             page d&apos;aide
           </Link>{" "}
           ou{" "}
-          <Link href="/contact" className="font-medium text-gold underline underline-offset-4">
+          <Link href="/contact" className="font-medium text-gold-ink underline underline-offset-4">
             contactez-nous directement
           </Link>
           .

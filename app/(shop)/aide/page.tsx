@@ -68,7 +68,7 @@ export default function AidePage() {
           <a
             key={id}
             href={`#${id}`}
-            className="rounded-full border border-border px-3 py-1.5 text-xs font-medium transition-colors hover:border-gold/50 hover:text-gold"
+            className="rounded-full border border-border px-3 py-1.5 text-xs font-medium transition-colors hover:border-gold/50 hover:text-gold-ink"
           >
             {titre}
           </a>
@@ -94,7 +94,7 @@ export default function AidePage() {
         </h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
           Écrivez-nous sur WhatsApp depuis la page{" "}
-          <Link href="/contact" className="font-medium text-gold underline underline-offset-4">
+          <Link href="/contact" className="font-medium text-gold-ink underline underline-offset-4">
             contact
           </Link>
           , nous répondons dans la journée.

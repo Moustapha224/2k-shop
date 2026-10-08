@@ -165,13 +165,13 @@ export default async function AccueilPage() {
               className="group flex items-start gap-3 rounded-xl border border-border/60 bg-card p-4 shadow-sm transition-all duration-200 hover:border-gold/40 hover:shadow-md"
             >
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted group-hover:bg-gold/10 transition-colors">
-                <Icon className="size-5 text-foreground/70 group-hover:text-gold transition-colors" />
+                <Icon className="size-5 text-foreground/70 group-hover:text-gold-ink transition-colors" />
               </div>
               <div>
                 <p className="text-sm font-semibold">{titre}</p>
                 <p className="mt-0.5 text-xs text-muted-foreground">{texte}</p>
               </div>
-              <ArrowRightIcon className="ml-auto size-4 shrink-0 text-muted-foreground/50 group-hover:text-gold transition-colors self-center" />
+              <ArrowRightIcon className="ml-auto size-4 shrink-0 text-muted-foreground/50 group-hover:text-gold-ink transition-colors self-center" />
             </div>
           ))}
         </div>
@@ -184,7 +184,7 @@ export default async function AccueilPage() {
             <h2 className="text-xl font-bold tracking-tight">Catégories</h2>
             <Link
               href="/produits"
-              className="inline-flex items-center gap-1 text-sm font-medium text-gold transition-opacity hover:opacity-80"
+              className="inline-flex items-center gap-1 text-sm font-medium text-gold-ink transition-opacity hover:opacity-80"
             >
               Voir toutes
               <ArrowRightIcon className="size-3.5" />
@@ -216,7 +216,7 @@ export default async function AccueilPage() {
                 <div className="flex items-center justify-between p-3">
                   <div>
                     <p className="text-sm font-semibold">{categorie.nom}</p>
-                    <p className="text-xs text-gold font-medium mt-0.5">
+                    <p className="text-xs text-gold-ink font-medium mt-0.5">
                       Découvrir →
                     </p>
                   </div>
@@ -233,7 +233,7 @@ export default async function AccueilPage() {
           <h2 className="text-xl font-bold tracking-tight">Nouveautés</h2>
           <Link
             href="/produits"
-            className="inline-flex items-center gap-1 text-sm font-medium text-gold transition-opacity hover:opacity-80"
+            className="inline-flex items-center gap-1 text-sm font-medium text-gold-ink transition-opacity hover:opacity-80"
           >
             Tout voir
             <ArrowRightIcon className="size-3.5" />
@@ -261,7 +261,7 @@ export default async function AccueilPage() {
                   main ? "bg-background/10" : "bg-muted"
                 )}
               >
-                <Icon className={cn("size-5", main ? "text-background" : "text-gold")} />
+                <Icon className={cn("size-5", main ? "text-background" : "text-gold-ink")} />
               </div>
               <div>
                 <p

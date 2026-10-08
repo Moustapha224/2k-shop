@@ -26,7 +26,7 @@ export function Header() {
           />
           <div className="flex flex-col leading-none">
             <span className="text-base font-bold tracking-tight">{SITE.nom}</span>
-            <span className="text-[10px] font-medium tracking-[0.18em] uppercase text-gold">
+            <span className="text-[10px] font-medium tracking-[0.18em] uppercase text-gold-ink">
               {SITE.slogan}
             </span>
           </div>
