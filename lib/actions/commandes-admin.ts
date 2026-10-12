@@ -3,11 +3,12 @@
 import { revalidatePath } from "next/cache";
 
 import { auth } from "@/auth";
-import { SITE, STATUTS_COMMANDE, type StatutCommande } from "@/lib/constants";
+import { STATUTS_COMMANDE, type StatutCommande } from "@/lib/constants";
 import { prisma } from "@/lib/db";
 import { sendOrderStatus } from "@/lib/email";
 import { statutMeriteUnEmail } from "@/lib/emails/order-status";
 import { normaliserTelephone } from "@/lib/format";
+import { urlSite } from "@/lib/url";
 
 export async function changerStatutCommande(commandeId: string, statut: StatutCommande) {
   const session = await auth();
@@ -35,7 +36,7 @@ export async function changerStatutCommande(commandeId: string, statut: StatutCo
       clientEmail: commande.clientEmail,
       statut,
       total: commande.total,
-      urlSuivi: `${SITE.url}/suivi/${commande.numero}?tel=${tel}`,
+      urlSuivi: `${urlSite()}/suivi/${commande.numero}?tel=${tel}`,
     }).catch((erreur) => {
       console.error(`[commandes-admin] Notification statut ${commande.numero} en echec :`, erreur);
     });

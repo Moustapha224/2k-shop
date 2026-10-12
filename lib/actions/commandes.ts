@@ -6,7 +6,8 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { sendOrderConfirmation, sendOrderNotification } from "@/lib/email";
 import { normaliserTelephone } from "@/lib/format";
-import { PREFIXE_COMMANDE, SITE } from "@/lib/constants";
+import { PREFIXE_COMMANDE } from "@/lib/constants";
+import { urlSite } from "@/lib/url";
 import { checkoutSchema, suiviSchema } from "@/lib/validations/checkout";
 
 export type CreerCommandeInput = {
@@ -141,7 +142,7 @@ export async function creerCommande(input: CreerCommandeInput): Promise<ActionEc
       quantite: l.quantite,
       sousTotal: l.sousTotal,
     })),
-    urlAdmin: `${SITE.url}/admin/commandes/${commande.id}`,
+    urlAdmin: `${urlSite()}/admin/commandes/${commande.id}`,
   }).catch((erreur) => {
     console.error(`[commandes] Notification ${numero} en echec :`, erreur);
   });
@@ -167,7 +168,7 @@ export async function creerCommande(input: CreerCommandeInput): Promise<ActionEc
         quantite: l.quantite,
         sousTotal: l.sousTotal,
       })),
-      urlSuivi: `${SITE.url}/suivi/${commande.numero}?tel=${analyse.data.clientTelephone}`,
+      urlSuivi: `${urlSite()}/suivi/${commande.numero}?tel=${analyse.data.clientTelephone}`,
     }).catch((erreur) => {
       console.error(`[commandes] Confirmation client ${numero} en echec :`, erreur);
     });
